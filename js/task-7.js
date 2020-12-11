@@ -1,9 +1,11 @@
 "use strict";
 
-const ID = function () {
-  return "_" + Math.random().toString(36).substr(2, 9);
-};
+let id = 0;
 
+const getId = function () {
+  id += 1;
+  return id;
+};
 /*
  * Типов транзацкий всего два.
  * Можно положить либо снять деньги со счета.
@@ -29,10 +31,11 @@ const account = {
    * Принимает сумму и тип транзакции.
    */
   createTransaction(amount, type) {
-    const id = ID();
-    const transaction = { id, amount, type };
-
-    return transaction;
+    return {
+      id: getId(),
+      amount,
+      type,
+    };
   },
 
   /*
@@ -59,11 +62,12 @@ const account = {
   withdraw(amount) {
     if (amount > this.balance) {
       console.log("You don't have enough money");
-    } else {
-      const transaction = this.createTransaction(amount, Transaction.WITHDRAW);
-      this.transactions.push(transaction);
-      this.balance -= amount;
+      return;
     }
+
+    const transaction = this.createTransaction(amount, Transaction.WITHDRAW);
+    this.transactions.push(transaction);
+    this.balance -= amount;
   },
 
   /*
@@ -104,10 +108,19 @@ account.deposit(500);
 account.deposit(500);
 account.withdraw(99);
 account.withdraw(500);
-
-// console.log(account.getBalance());
-
-console.log(account.getTransactionTotal(Transaction.DEPOSIT));
-console.log(account.getTransactionTotal(Transaction.WITHDRAW));
+account.withdraw(500);
 
 console.log(account.transactions);
+
+console.log("Balance", account.getBalance());
+
+console.log(
+  "Deposit transactions: ",
+  account.getTransactionTotal(Transaction.DEPOSIT)
+);
+console.log(
+  "Withdraw transactions: ",
+  account.getTransactionTotal(Transaction.WITHDRAW)
+);
+
+console.log("Transaction ID 3:", account.getTransactionDetails(3));
